@@ -31,7 +31,6 @@ public class BorrowingController {
     @PutMapping("/api/return/{bookId}/patron/{patronId}")
     public ResponseEntity<Borrowing> returnBook(@PathVariable int bookId,
                                                 @PathVariable int patronId){
-        //expectedReturnDate should be in this format "2024-6-22”
         Borrowing borrowing=borrowingService.retunrnBook(bookId,patronId);
         return new ResponseEntity<>(borrowing, HttpStatus.ACCEPTED);
     }

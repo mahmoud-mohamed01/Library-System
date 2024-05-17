@@ -1,8 +1,6 @@
 package com.maidsTask.LibrarySystem.controller;
 
-import com.maidsTask.LibrarySystem.dto.BookDTO;
-import com.maidsTask.LibrarySystem.dto.Message;
-import com.maidsTask.LibrarySystem.dto.PatronDTO;
+import com.maidsTask.LibrarySystem.dto.*;
 import com.maidsTask.LibrarySystem.exception.BadRequestException;
 import com.maidsTask.LibrarySystem.model.Book;
 import com.maidsTask.LibrarySystem.model.Patron;
@@ -24,7 +22,7 @@ public class PatronController {
    private PatronService patronService;
 
     @PostMapping
-    public ResponseEntity<Patron> addBook(@Valid @RequestBody PatronDTO patronDTO, Errors errors){
+    public ResponseEntity<Patron> addPatron(@Valid @RequestBody PatronDTO patronDTO, Errors errors){
         System.out.println(patronDTO);
         if (errors.hasErrors()){
             //get validation error messages
@@ -37,26 +35,46 @@ public class PatronController {
         return new ResponseEntity<>(patron, HttpStatus.CREATED);
     }
 
+    @PostMapping("/login")
+    ResponseEntity<Token> patronLogin( @Valid @RequestBody LoginDTO loginDTO,Errors errors){
+        if (errors.hasErrors()){
+            //get validation error messages
+            String message=errors.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                    .collect(Collectors.joining("; "));
+            throw new BadRequestException(message);
+        }
+
+        String jwt=patronService.loginPatron(loginDTO);
+        if (jwt == null){
+            throw  new BadRequestException("email or password is invalid");
+        }
+        else {
+
+            return ResponseEntity.ok(new Token(jwt));
+        }
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Patron> getBook(@PathVariable int id){
+    public ResponseEntity<Patron> getPatron(@PathVariable int id){
         Patron patron=patronService.getPatron(id);
         return new ResponseEntity<>(patron,HttpStatus.ACCEPTED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Patron>>getAllBooks(){
+    public ResponseEntity<List<Patron>>getAllPatrons(){
         List<Patron> patrons=patronService.getAllPatrons();
         return new ResponseEntity<>(patrons,HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Message> updateBook(@PathVariable int id, @RequestBody PatronDTO patronDTO){
+    public ResponseEntity<Message> updatePatron(@PathVariable int id, @RequestBody PatronDTO patronDTO){
         patronService.updatePatron(id,patronDTO);
         return new ResponseEntity<>(new Message("patron updated Succesfuly!"),HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Message> deleteBook(@PathVariable int id){
+    public ResponseEntity<Message> deletePatron(@PathVariable int id){
         patronService.deletePatron(id);
         return new ResponseEntity<>(new Message("patron deleted Succesfully!"),HttpStatus.ACCEPTED);
     }
