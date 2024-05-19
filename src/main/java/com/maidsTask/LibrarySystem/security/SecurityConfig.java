@@ -20,6 +20,7 @@ public class SecurityConfig {
         //change permissions to access the end point
         httpSecurity.authorizeHttpRequests().
                 requestMatchers("/api/patrons","/api/patrons/**","/api/books","/api/books/**").permitAll().
+                //All endpoints are public except borrowing and returning endpoints needs authentication using jwt
                 anyRequest().authenticated();
         return httpSecurity.build();
     }
